@@ -17,22 +17,35 @@ public class ContainerListScreen : Screen
     protected override void Draw()
     {
 
-        Clear(this); //Clean the screen
+        Clear(this);
 
-        listPage.AddColumn("ID", "ID");
-        listPage.AddColumn("Name", "Name");
+        listPage.AddKey(ConsoleKey.F1, Stop);
+        listPage.AddKey(ConsoleKey.F2, Start);
+        Console.WriteLine("Press F1 to stop container");
+        Console.WriteLine("Press F2 to start container");
+
+        listPage.AddColumn("Name", "Name", 20);
         listPage.AddColumn("State", "State");
+        listPage.AddColumn("ID", "ID", 40);
 
         Container selected = listPage.Select();
         if (selected != null)
         {
-            //Screen.Display(new EditTodoScreen(selected))
-            System.Console.WriteLine(selected);
+            Console.WriteLine(selected);
         }
         else
         {
             Quit();
             return;
         }
+    }
+
+    public void Stop(Container c)
+    {
+        Podman.ContainerCMD(c.ID, "stop");
+    }
+    public void Start(Container c)
+    {
+        Podman.ContainerCMD(c.ID, "start");
     }
 }

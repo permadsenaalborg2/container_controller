@@ -3,6 +3,24 @@ using System.Text.Json;
 using System;
 public class Podman
 {
+        public static bool ContainerCMD(string ID, string cmd)
+    {
+        var proc = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = "podman",
+                Arguments = $" {cmd} {ID}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            }
+        };
+
+        proc.Start();
+        return true;
+    }
+
     public static List<Container> GetContainers()
     {
         var proc = new Process
