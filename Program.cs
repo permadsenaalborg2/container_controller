@@ -1,8 +1,8 @@
 ﻿using System;
 using TECHCOOL.UI;
 
-var containers = Podman.GetContainers();
-Screen.Display(new ContainerListScreen(containers));
+var screen = new ContainerListScreen();
+Screen.Display(screen);
 
 Console.Clear();
 

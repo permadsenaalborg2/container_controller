@@ -4,26 +4,38 @@ public class ContainerListScreen : Screen
 {
     private ListPage<Container> listPage;
 
-    public ContainerListScreen(List<Container> lst)
+    public ContainerListScreen()
     {
-        listPage = new ListPage<Container>();
-        foreach (Container c in lst)
+        listPage = new();
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        var containers = Podman.GetContainers();
+        
+        listPage = new();
+        foreach (Container c in containers)
         {
             listPage.Add(c);
         }
     }
 
+
     public override string Title { get; set; } = "List of containers";
+
+    public void Pre_Draw()
+    {
+        Console.WriteLine("Press F1 to stop container");
+        Console.WriteLine("Press F2 to start container");
+    }
     protected override void Draw()
     {
-
         Clear(this);
+        Pre_Draw();
 
         listPage.AddKey(ConsoleKey.F1, Stop);
         listPage.AddKey(ConsoleKey.F2, Start);
-        Console.WriteLine("Press F1 to stop container");
-        Console.WriteLine("Press F2 to start container");
-
         listPage.AddColumn("Name", "Name", 20);
         listPage.AddColumn("State", "State");
         listPage.AddColumn("ID", "ID", 40);
@@ -42,10 +54,17 @@ public class ContainerListScreen : Screen
 
     public void Stop(Container c)
     {
-        Podman.ContainerCMD(c.ID, "stop");
+        Podman.ContainerCMD("stop", c.ID);
+        Console.Clear();
+        Console.WriteLine("Stopping ...");
+        Thread.Sleep(2000);
+        Console.Clear();
+        Pre_Draw();
+        Refresh();
     }
     public void Start(Container c)
     {
-        Podman.ContainerCMD(c.ID, "start");
+        Podman.ContainerCMD("start", c.ID);
+        Refresh();
     }
 }

@@ -3,57 +3,37 @@ using System.Text.Json;
 using System;
 public class Podman
 {
-        public static bool ContainerCMD(string ID, string cmd)
+    public static string ContainerCMD(string cmd, string arg)
     {
         var proc = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "podman",
-                Arguments = $" {cmd} {ID}",
+                Arguments = $" {cmd} {arg}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
+                // RedirectStandardError = true,
                 CreateNoWindow = true
             }
         };
 
         proc.Start();
-        return true;
+        var output = proc.StandardOutput.ReadToEnd();
+        //var error = proc.StandardError.ReadToEnd();
+        return output;
     }
 
     public static List<Container> GetContainers()
     {
-        var proc = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "podman",
-                Arguments = " ps -a --format json",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            }
-        };
+        var output = ContainerCMD("ps", "-a --format json");
 
-        proc.Start();
-        JsonDocument doc;
-
-        if (proc.StandardOutput.EndOfStream)
-        {
-            Console.WriteLine("Error");
-            return null;
-        }
-        else
-        {
-            var output = proc.StandardOutput.ReadToEnd();
-            doc = JsonDocument.Parse(output);
-        }
+        JsonDocument doc = JsonDocument.Parse(output);
 
         List<Container> containers = [];
 
         foreach (JsonElement j in doc.RootElement.EnumerateArray())
         {
-
             containers.Add(new Container()
             {
                 ID = j.GetProperty("Id").ToString(),
