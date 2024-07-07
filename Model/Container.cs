@@ -5,7 +5,10 @@ public class Container
     {
         get
         {
-            return id.Substring(0, 10) + "..";
+            if (id.Length>10)
+                return id.Substring(0, 10) + "..";
+            else
+                return id;
         }
         set
         {

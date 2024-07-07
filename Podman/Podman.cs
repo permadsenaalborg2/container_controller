@@ -1,34 +1,58 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System;
+
 public class Podman
 {
-    public static string ContainerCMD(string cmd, string arg)
+
+    public class PodmanResult
     {
+        public string StdOut { get; set; } = String.Empty;
+        public string StdErr { get; set; } = String.Empty;
+        public int ExitCode { get; set; }
+    }
+
+    public static PodmanResult RunPodmanCmd(string cmd, string args)
+    {
+
         var proc = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "podman",
-                Arguments = $" {cmd} {arg}",
+                Arguments = $" {cmd} {args}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
-                // RedirectStandardError = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             }
         };
 
         proc.Start();
         var output = proc.StandardOutput.ReadToEnd();
-        //var error = proc.StandardError.ReadToEnd();
-        return output;
+        var error = proc.StandardError.ReadToEnd();
+        return new PodmanResult { StdErr = error, StdOut = output, ExitCode = 0 };
     }
 
-    public static List<Container> GetContainers()
+    public static async Task<PodmanResult> RunPodmanCmdAsync(string cmd, string args)
     {
-        var output = ContainerCMD("ps", "-a --format json");
+        PodmanResult res = new();
 
-        JsonDocument doc = JsonDocument.Parse(output);
+        await Task.Run(() =>
+        {
+            res = RunPodmanCmd(cmd, args);
+        });
+
+        // Thread.Sleep(5000);
+
+        return res;
+    }
+
+    public async static Task<List<Container>> GetContainers()
+    {
+        var output = await RunPodmanCmdAsync("ps", "-a --format json");
+
+        JsonDocument doc = JsonDocument.Parse(output.StdOut);
 
         List<Container> containers = [];
 
