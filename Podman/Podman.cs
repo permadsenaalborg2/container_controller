@@ -27,7 +27,7 @@ public class Podman
                 CreateNoWindow = true
             }
         };
-
+        
         proc.Start();
         var output = proc.StandardOutput.ReadToEnd();
         var error = proc.StandardError.ReadToEnd();
@@ -63,6 +63,8 @@ public class Podman
                 ID = j.GetProperty("Id").ToString(),
                 Name = j.GetProperty("Names")[0].ToString(),
                 State = j.GetProperty("State").ToString(),
+                CreatedAt = j.GetProperty("CreatedAt").ToString(),
+                Image = j.GetProperty("Image").ToString(),
             });
         }
         return containers;

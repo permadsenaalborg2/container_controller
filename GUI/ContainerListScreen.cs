@@ -29,12 +29,13 @@ public class ContainerListScreen : Screen
     }
     private void Refresh()
     {
-        Clear();
+        Console.Clear();  // Clear();
         Console.WriteLine("  getting podman data ...");
         var PodmanTask = Podman.GetContainers();
         ProgressBar(PodmanTask);
 
-        listPage.Clear();
+        // to do re-enable
+        //listPage.Clear();
         foreach (var container in PodmanTask.Result)
         {
             listPage.Add(container);
@@ -48,9 +49,11 @@ public class ContainerListScreen : Screen
 
     public void Pre_Draw()
     {
+        Console.WriteLine();
         Console.WriteLine("Press F1 to stop container");
         Console.WriteLine("Press F2 to start container");
         Console.WriteLine("Press F5 to refresh");
+        Console.WriteLine();
     }
     protected override void Draw()
     {
@@ -62,12 +65,18 @@ public class ContainerListScreen : Screen
         listPage.AddKey(ConsoleKey.F5, Refresh);
         listPage.AddColumn("Name", "Name", 20);
         listPage.AddColumn("State", "State");
-        listPage.AddColumn("ID", "ID", 40);
+        listPage.AddColumn("ID", "PrettyID", 8);
+        listPage.AddColumn("Image", "Image", 50);
+        listPage.AddColumn("CreatedAt", "CreatedAt", 30);
 
         Container selected = listPage.Select();
         if (selected != null)
         {
+            Clear();
+
             Console.WriteLine(selected);
+            Console.ReadLine();
+
         }
         else
         {
@@ -79,19 +88,25 @@ public class ContainerListScreen : Screen
     public void Stop(Container c)
     {
         Console.Clear();
-        Console.WriteLine("  Stopping ...");
+        Console.WriteLine($"  Stopping {c.ID}");
 
-        Task StopTask = Podman.RunPodmanCmdAsync("stop", c.ID);
+        var StopTask = Podman.RunPodmanCmdAsync("stop", c.ID);
         ProgressBar(StopTask);
+        Console.WriteLine(StopTask.Result.StdOut);
+        Console.WriteLine(StopTask.Result.StdErr);
+ 
         Refresh();
     }
     public void Start(Container c)
     {
         Console.Clear();
-        Console.WriteLine("  Starting ...");
+        Console.WriteLine($"  Starting  {c.ID}");
 
-        Task StartTask = Podman.RunPodmanCmdAsync("start", c.ID);
+        var StartTask = Podman.RunPodmanCmdAsync("start", c.ID);
         ProgressBar(StartTask);
+        Console.WriteLine(StartTask.Result.StdOut);
+        Console.WriteLine(StartTask.Result.StdErr);
+
         Refresh();
     }
     public void Refresh(Container c)

@@ -1,21 +1,37 @@
+using System.Text;
+
 public class Container
 {
-    private string id = String.Empty;
-    public string ID
+    public string ID { get; set; } = String.Empty;
+
+    public string PrettyID
     {
         get
         {
-            if (id.Length>10)
-                return id.Substring(0, 10) + "..";
+            if (ID.Length > 4)
+                return ID.Substring(0, 4) + " ..";
             else
-                return id;
-        }
-        set
-        {
-            id=value;
+                return ID;
         }
     }
-    
+
     public string Name { get; set; } = String.Empty;
     public string State { get; set; } = String.Empty;
+    public string CreatedAt { get; set; } = String.Empty;
+    public string Image { get; set; } = String.Empty;
+
+
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+
+        sb.AppendLine("Container: ");
+        sb.AppendLine($"Id: {ID} ");
+        sb.AppendLine($"Name: {Name} ");
+        sb.AppendLine($"State: {State} ");
+        sb.AppendLine($"Image: {Image} ");
+        sb.AppendLine($"CreatedAt: {CreatedAt} ");
+
+        return sb.ToString();
+    }
 }
