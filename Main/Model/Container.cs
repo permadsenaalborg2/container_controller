@@ -9,7 +9,7 @@ public class Container
         get
         {
             if (ID.Length > 4)
-                return ID.Substring(0, 4) + " ..";
+                return ID[..4] + " ..";
             else
                 return ID;
         }
